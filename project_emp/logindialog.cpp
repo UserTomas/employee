@@ -9,7 +9,6 @@ LoginDialog::LoginDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::LoginDialog)
 {
-//    busines = bus;
     ui->setupUi(this);
     LoginDialog::setFixedSize(300,116);
     ui->lineEditPass->setEchoMode(QLineEdit::Password);
@@ -34,7 +33,4 @@ void LoginDialog::on_pushButton_clicked()
         }
         QDialog::accept();
     }
-
-
-//    LoginDialog::close();
 }

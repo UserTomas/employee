@@ -39,6 +39,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->treeWidget->setColumnCount(2);
     ui->treeWidget->setHeaderLabels((QStringList)"First Name"<<"Last Name" << "ID" << "Date From" <<"Date To" << "Salary");
+    ui->dateEditFrom->setDate(QDate::currentDate());
+    ui->dateEditFrom->setDisplayFormat("dd.MMM.yyyy");
+    ui->dateEditTo->setDate(QDate::currentDate());
+    ui->dateEditTo->setDisplayFormat("dd.MMM.yyyy");
     this->setEnabled(false);
 
     LoginDialog *login = new LoginDialog(this);
@@ -61,12 +65,21 @@ void MainWindow::openInsertDialog()
     mInsertDialog->show();
 }
 
+/**
+ * @brief MainWindow::on_pushButton_clicked
+ * put data from database to the TreeWidget
+ */
 void MainWindow::on_pushButton_clicked()
 {
     ui->treeWidget->clear();
 
     std::vector<databaseData>  data;
-    data = busines.SelectAll();
+    if(ui->checkBoxDates->isChecked())
+    {
+        data = busines.SelectWithDates(ui->dateEditFrom->date(), ui->dateEditTo->date());
+    }else {
+        data = busines.SelectAll();
+    }
     for(int i =0; i< data.size(); i++)
     {
         addRoot(data.at(i) .getFirstName(),data.at(i).getLastName(), data.at(i).getId(),
@@ -97,7 +110,6 @@ void MainWindow::addChild(QTreeWidgetItem *parent, QString name, QString descrip
 
 void MainWindow::on_update_clicked()
 {
-//    QStringList infos;
     if(!ui->treeWidget->currentItem())
     {
         QMessageBox::warning(this,"Error","No selected row");
@@ -118,26 +130,12 @@ void MainWindow::Active()
 
 void MainWindow::on_btnReport_clicked()
 {
+    QDate from = ui->dateEditFrom->date();
+    QDate to = ui->dateEditTo->date();
+    if(from > to){
+        QMessageBox::warning(this,"Error","DateTo must be greater than DateFrom");
+        return;
+   }
 
-    QString fileName = "exportpdf";
-       if (QFileInfo(fileName).suffix().isEmpty()) { fileName.append(".pdf"); }
-
-       QPrinter printer(QPrinter::PrinterResolution);
-       printer.setOutputFormat(QPrinter::PdfFormat);
-       printer.setPaperSize(QPrinter::A4);
-       printer.setOutputFileName(fileName);
-
-//       QTextDocument doc;
-//       doc.setHtml("<h1>Hello, World!</h1>\n<p>Lorem ipsum dolor sit amet, consectitur adipisci elit.</p>");
-//       doc.setPageSize(printer.pageRect().size()); // This is necessary if you want to hide the page number
-//       doc.setHtml();
-//       doc.print(&printer);
-
-       QPainter painter;
-       painter.begin(&printer);
-
-         QTreeWidgetItem *row = ui->treeWidget->currentItem();
-
-        painter.drawText(10,90,row->text(0));
-
+   busines.Report(from,to);
 }

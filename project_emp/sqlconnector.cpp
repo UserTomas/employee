@@ -70,12 +70,8 @@ vector<databaseData> sqlConnector::selectAll()
     recdata.clear();
 //    query.prepare("select* from person;");
     query.prepare("select p.fname, p.lname, p.id_person, s.date_from, s.date_to, s.salary from person  p LEFT JOIN position s USING(id_person)");
-    query.exec(); //nieco
-    while(query.next()) {
-//            QString name = query.value(0).toString();
-//            QString lname = query.value(1).toString();
-//            int id = query.value(2).toInt();
-//            QDate datFrom = query.value(3).toDate();
+    query.exec();
+    while(query.next()) {   //get all data about employees
             databaseData dat;
             dat.setFirstName(query.value(0).toString());
             dat.setLastName(query.value(1).toString());
@@ -84,10 +80,6 @@ vector<databaseData> sqlConnector::selectAll()
             dat.setDateTo(query.value(4).toDate());
             dat.setSalary(query.value(5).toInt());
             recdata.push_back(dat);
-//            qDebug() <<"meno: "<< name;
-//            qDebug() <<"priezvisko: " <<lname;
-//            qDebug() <<"id: " <<id;
-//            qDebug() <<"datfrom: " <<datFrom.toString("dd.MM.yyyy");
         }
     return recdata;
 }
@@ -103,6 +95,12 @@ bool sqlConnector::Update(databaseData *dat)
        else return true;
 }
 
+/**
+ * @brief sqlConnector::addEndDate
+ * @param dat
+ * @return
+ * add date to database when eployee leaving company
+ */
 bool sqlConnector::addEndDate(databaseData *dat)
 {
     QSqlQuery query;
@@ -123,6 +121,28 @@ bool sqlConnector::proLongContranct(databaseData *dat)
     query.bindValue(":id",dat->getId());
     if(!query.exec()) return false;
        else return true;
+}
+
+vector<databaseData> sqlConnector::makeReport(QDate from, QDate to)
+{
+    QSqlQuery query;
+    recdata.clear();
+    query.prepare("select p.fname, p.lname, p.id_person, s.date_from, s.date_to, s.salary from person  p JOIN position s USING(id_person) where (s.date_from < :to) AND (s.date_to > :from)");
+    query.bindValue(":from",from);
+    query.bindValue(":to",to);
+    query.exec();
+    while(query.next()) {
+            databaseData dat;
+            dat.setFirstName(query.value(0).toString());
+            dat.setLastName(query.value(1).toString());
+            dat.setId(query.value(2).toInt());
+            dat.setDateFrom(query.value(3).toDate());
+            dat.setDateTo(query.value(4).toDate());
+            dat.setSalary(query.value(5).toInt());
+            recdata.push_back(dat);
+        }
+    return recdata;
+
 }
 
 

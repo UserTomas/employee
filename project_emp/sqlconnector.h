@@ -23,6 +23,7 @@ public:
     bool insertPosition(databaseData *dat);
     bool addEndDate(databaseData *dat);
     bool proLongContranct(databaseData *dat);
+    std::vector<databaseData> makeReport(QDate from, QDate to);
 };
 
 #endif // SQLCONNECTOR_H

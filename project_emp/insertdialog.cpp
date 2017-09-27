@@ -11,7 +11,9 @@ InsertDialog::InsertDialog(QWidget *parent) :
     ui->setupUi(this);
     editing = false;
     data = new databaseData();
-
+    ui->dateEditFrom->setDate(QDate::currentDate());
+    ui->dateEditTo->setDate(QDate::currentDate());
+    ui->lineEditSalary->setInputMask("0000000");
 
 }
 
