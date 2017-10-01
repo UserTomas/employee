@@ -20,10 +20,11 @@ public:
     std::vector<databaseData> selectAll();
     bool connect(QString usr, QString pass);
     bool Update(databaseData *dat);
-    bool insertPosition(databaseData *dat);
+    bool insertPosition(databaseData *dat, int id);
     bool addEndDate(databaseData *dat);
     bool proLongContranct(databaseData *dat);
     std::vector<databaseData> makeReport(QDate from, QDate to);
+    int selectRow();
 };
 
 #endif // SQLCONNECTOR_H

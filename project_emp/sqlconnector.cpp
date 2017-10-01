@@ -46,15 +46,18 @@ bool sqlConnector::insert(databaseData* dat)
     query.bindValue(":lname",dat->getLastName());
     query.bindValue(":fname",dat->getFirstName());
     if(!query.exec()) return false;
-       else return true;
+       else
+    {
+       return true;
+    }
 }
 
-bool sqlConnector::insertPosition(databaseData *dat)
+bool sqlConnector::insertPosition(databaseData *dat, int id)
 {
     QSqlQuery query;
     query.prepare("insert into position (id_person, date_from, date_to, salary)\
                    values(:id,:from,:to,:sal);");
-    query.bindValue(":id",dat->getId());
+    query.bindValue(":id",id);
     query.bindValue(":from",dat->getDateFrom());
     query.bindValue(":to",dat->getDateTo());
     query.bindValue(":sal",dat->getSalary());
@@ -84,6 +87,18 @@ vector<databaseData> sqlConnector::selectAll()
     return recdata;
 }
 
+int sqlConnector::selectRow()
+{
+    QSqlQuery query;
+    int id = 0;
+    query.prepare("select max(id_person) from person;");
+    query.exec();
+    while(query.next()) {//get id
+            id = query.value(0).toInt();
+    }
+    return id;
+}
+
 bool sqlConnector::Update(databaseData *dat)
 {
     QSqlQuery query;
@@ -92,7 +107,11 @@ bool sqlConnector::Update(databaseData *dat)
     query.bindValue(":lname",dat->getLastName());
     query.bindValue(":id",dat->getId());
     if(!query.exec()) return false;
-       else return true;
+       else
+    {
+        addEndDate(dat);
+        return true;
+    }
 }
 
 /**
@@ -104,8 +123,9 @@ bool sqlConnector::Update(databaseData *dat)
 bool sqlConnector::addEndDate(databaseData *dat)
 {
     QSqlQuery query;
-    query.prepare("update postition set date_to = :to  where id_person = :id;");
+    query.prepare("update position set date_to = :to  where id_person = :id and date_from = :from;");
     query.bindValue(":to",dat->getDateTo());
+    query.bindValue(":from",dat->getDateFrom());
     query.bindValue(":id",dat->getId());
     if(!query.exec()) return false;
        else return true;

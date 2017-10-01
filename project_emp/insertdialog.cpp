@@ -2,6 +2,7 @@
 #include "ui_insertdialog.h"
 #include <QDebug>
 #include <QDate>
+#include <QMessageBox>
 
 
 InsertDialog::InsertDialog(QWidget *parent) :
@@ -33,6 +34,7 @@ InsertDialog::InsertDialog(bool edit, QString fname, QString lname, int id, int 
     data->setId(id);
     ui->lineEditSalary->setDisabled(true);
     ui->dateEditFrom->setDisabled(true);
+    ui->checkBoxUseDateTo->setChecked(true);
 }
 
 
@@ -52,9 +54,17 @@ void InsertDialog::on_btnCancel_clicked()
 
 void InsertDialog::on_btnOk_clicked()
 {
-
+    if(ui->lineEditFName->text().isEmpty() || ui->lineEditLName->text().isEmpty()||
+            ui->lineEditSalary->text().isEmpty())
+    {
+        QMessageBox::warning(this,"Error","Missing values");
+        return;
+    }
+    if(ui->checkBoxUseDateTo->isChecked()) data->setDateTo(ui->dateEditTo->date());
     data->setFirstName(ui->lineEditFName->text());
     data->setLastName(ui->lineEditLName->text());
+    data->setDateFrom(ui->dateEditFrom->date());
+    data->setSalary(ui->lineEditSalary->text().toInt());
     if(!editing){
         busines.Insert(data);
         this->close();

@@ -34,7 +34,9 @@ std::vector<databaseData> Business::SelectWithDates(QDate from, QDate to)
 
 bool Business::Insert(databaseData *data)
 {
-    connector.insert(data);
+    if(!connector.insert(data)) return false;
+     int id = connector.selectRow();
+     connector.insertPosition(data, id);
 }
 
 bool Business::Update(databaseData *data)
@@ -136,6 +138,7 @@ void Business::CreatePdf(std::vector<databaseData> dat, std::vector <int> months
                              "\t" + QString::number(months.at(i)));
        }
        QPrintDialog printDialog(&printer);
+
        if (printDialog.exec() == QDialog::Accepted) {
            // print ...
        }
